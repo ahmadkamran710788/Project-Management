@@ -29,8 +29,8 @@ const ProjectType = new GraphQLObjectType({
     id: { type: GraphQLID },
     name: { type: GraphQLString },
     description: { type: GraphQLString },
-    status: { type: GraphQLString },
-    client: {
+    status: { type: ProjectStatusEnum },
+    clientId: {
       type: ClientType,
       resolve(parent, args) {
         return Client.findById(parent.clientId);
@@ -71,6 +71,15 @@ const RootQuery = new GraphQLObjectType({
   },
 });
 
+const ProjectStatusEnum = new GraphQLEnumType({
+  name: "ProjectStatus",
+  values: {
+    NEW: { value: "Not Started" },
+    PROGRESS: { value: "In Progress" },
+    COMPLETED: { value: "Complete" },
+  },
+});
+
 //Mutation
 const mutation = new GraphQLObjectType({
   name: "Mutation",
@@ -98,6 +107,62 @@ const mutation = new GraphQLObjectType({
       },
       resolve(parent, args) {
         return Client.findByIdAndDelete(args.id);
+      },
+    },
+
+    addProject: {
+      type: ProjectType,
+      args: {
+        name: { type: GraphQLNonNull(GraphQLString) },
+        description: { type: GraphQLNonNull(GraphQLString) },
+        status: {
+          type: ProjectStatusEnum,
+          defaultValue: "Not Started",
+        },
+        clientId: { type: GraphQLNonNull(GraphQLID) },
+      },
+      resolve(parent, args) {
+        const projectnew = new Project({
+          name: args.name,
+          description: args.description,
+          status: args.status,
+          clientId: args.clientId,
+        });
+        return projectnew.save();
+      },
+    },
+    updateProject: {
+      type: ProjectType,
+      args: {
+        id: { type: GraphQLNonNull(GraphQLID) },
+        name: { type: GraphQLNonNull(GraphQLString) },
+        description: { type: GraphQLNonNull(GraphQLString) },
+        status: {
+          type: ProjectStatusEnum,
+          defaultValue: "Not Started",
+        },
+      },
+      resolve(parent, args) {
+        return Project.findByIdAndUpdate(
+          args.id,
+          {
+            $set: {
+              name: args.name,
+              description: args.description,
+              status: args.status,
+            },
+          },
+          { new: true }
+        );
+      },
+    },
+    deleteProject: {
+      type: ProjectType,
+      args: {
+        id: { type: GraphQLNonNull(GraphQLID) },
+      },
+      resolve(parent, args) {
+        return Project.findByIdAndDelete(args.id);
       },
     },
   },
