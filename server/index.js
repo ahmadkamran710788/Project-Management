@@ -1,12 +1,14 @@
 const express = require("express");
 require("dotenv").config();
 const port = process.env.PORT || 5000;
+const cors = require("cors");
 const { graphqlHTTP } = require("express-graphql");
 const connectDB = require("./config/db");
 const schema = require("./Schema/schema");
 const app = express();
 
 connectDB(process.env.MONGO_URL);
+app.use(cors());
 
 app.use(
   "/graphql",
