@@ -17,6 +17,17 @@ const ADD_PROJECT_MUTATION = gql`
   }
 `;
 
+const UPDATE_PROJECT_MUTATION = gql`
+  mutation updateProject($id:ID!, $name: String!, $description: String!, $status: ProjectStatus!) {
+    updateProject(id:$id,name: $name, description: $description, status: $status) {
+      id
+      name
+      description
+      status 
+      
+    }
+  }
+`;
 const DeleteProject = gql`
 mutation deleteProject($id:ID!){
     deleteProject(id:$id){
@@ -27,4 +38,4 @@ mutation deleteProject($id:ID!){
     }
 }
 `;
-export { ADD_PROJECT_MUTATION, DeleteProject };
+export { ADD_PROJECT_MUTATION, DeleteProject, UPDATE_PROJECT_MUTATION };

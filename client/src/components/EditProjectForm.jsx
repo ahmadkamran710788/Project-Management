@@ -2,15 +2,31 @@ import React from "react";
 import { useState } from "react";
 import { useMutation } from "@apollo/client";
 import { Get_Project } from "../Queries/projectQueries";
+import { UPDATE_PROJECT_MUTATION } from "../mutation/projectMutation";
 
 export default function EditProjectForm({ project }) {
   const [name, setName] = useState(project.name);
   const [description, setDescription] = useState(project.description);
   const [status, setStatus] = useState("");
+  const [updateProject] = useMutation(UPDATE_PROJECT_MUTATION);
+
+  const onSubmit = (e) => {
+    e.preventDefault();
+    if (!name || !description || !status) {
+      return alert("please fill in all fields");
+    }
+    console.log(1);
+
+    updateProject({
+      variables: { id: project.id, name, description, status },
+      refetchQueries: [{ query: Get_Project, variables: { id: project.id } }],
+    });
+  };
+
   return (
     <div className="mt-5">
       <h3>Update Detail</h3>
-      <form>
+      <form onSubmit={onSubmit}>
         <div className="mb-3">
           <label className="form-label">Name</label>
           <input
@@ -44,11 +60,7 @@ export default function EditProjectForm({ project }) {
           </select>
         </div>
 
-        <button
-          type="submit"
-          data-bs-dismiss="modal"
-          className="btn btn-primary"
-        >
+        <button type="submit" className="btn btn-primary">
           Submit
         </button>
       </form>
